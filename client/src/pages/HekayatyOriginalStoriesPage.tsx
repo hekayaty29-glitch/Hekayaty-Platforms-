@@ -13,8 +13,11 @@ export default function HekayatyOriginalStoriesPage() {
   const { data: stories, isLoading } = useQuery({
     queryKey: ["/api/stories", { placement: "Hekayaty Originals" }],
     queryFn: async () => {
-      const res = await apiRequest("GET", "/api/stories?placement=" + encodeURIComponent("Hekayaty Originals"));
-      return res.json();
+      const { getEdgeFunctionUrl, EDGE_FUNCTIONS } = await import('../lib/api-config');
+      const res = await fetch(`${getEdgeFunctionUrl(EDGE_FUNCTIONS.STORIES_LIST)}?placement=${encodeURIComponent("Hekayaty Originals")}`);
+      if (!res.ok) throw new Error('Failed to fetch Hekayaty Original stories');
+      const data = await res.json();
+      return data.stories || [];
     },
   });
 

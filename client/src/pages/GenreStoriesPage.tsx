@@ -20,7 +20,7 @@ import Container from "@/components/layout/Container";
 
 export default function GenreStoriesPage() {
   const [, params] = useRoute("/genres/:id");
-  const genreId = params ? parseInt(params.id) : undefined;
+  const genreId = params && params.id ? parseInt(params.id) : undefined;
   const [selectedGenreId, setSelectedGenreId] = useState<number | undefined>(genreId);
   const [searchQuery, setSearchQuery] = useState("");
   const [sortBy, setSortBy] = useState("newest");
@@ -36,6 +36,16 @@ export default function GenreStoriesPage() {
     queryKey: [`/api/stories${selectedGenreId ? `?genreId=${selectedGenreId}` : ''}`],
     enabled: true,
     staleTime: 1000 * 60,
+    queryFn: async () => {
+      const { getEdgeFunctionUrl, EDGE_FUNCTIONS } = await import('../lib/api-config');
+      const url = selectedGenreId 
+        ? `${getEdgeFunctionUrl(EDGE_FUNCTIONS.STORIES_LIST)}?genreId=${selectedGenreId}`
+        : getEdgeFunctionUrl(EDGE_FUNCTIONS.STORIES_LIST);
+      const res = await fetch(url);
+      if (!res.ok) throw new Error('Failed to fetch genre stories');
+      const data = await res.json();
+      return data.stories || [];
+    }
   });
   
   // Update selected genre ID when route changes
