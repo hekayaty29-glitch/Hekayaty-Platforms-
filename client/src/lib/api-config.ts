@@ -11,7 +11,7 @@ export const API_CONFIG = {
   LEGACY_API_BASE: '/api',
   
   // Feature flag to switch between Edge Functions and legacy API
-  USE_EDGE_FUNCTIONS: import.meta.env.VITE_USE_EDGE_FUNCTIONS !== 'false', // Default to true
+  USE_EDGE_FUNCTIONS: false, // Temporarily disabled for debugging
 }
 
 // Edge Functions endpoint mappings
@@ -45,10 +45,15 @@ export const EDGE_FUNCTIONS = {
 
 // Helper function to get the correct API URL
 export function getApiUrl(endpoint: string): string {
-  if (API_CONFIG.USE_EDGE_FUNCTIONS) {
-    return `${API_CONFIG.EDGE_FUNCTIONS_BASE}/${endpoint}`
+  try {
+    if (API_CONFIG.USE_EDGE_FUNCTIONS) {
+      return `${API_CONFIG.EDGE_FUNCTIONS_BASE}/${endpoint}`
+    }
+    return `${API_CONFIG.LEGACY_API_BASE}/${endpoint}`
+  } catch (error) {
+    console.warn('API config error, falling back to legacy:', error)
+    return `${API_CONFIG.LEGACY_API_BASE}/${endpoint}`
   }
-  return `${API_CONFIG.LEGACY_API_BASE}/${endpoint}`
 }
 
 // Helper function to get Edge Function URL
