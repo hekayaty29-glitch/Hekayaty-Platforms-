@@ -25,11 +25,15 @@ serve(async (req) => {
       return createErrorResponse('No file provided')
     }
 
+    // Convert file to buffer
+    const buffer = new Uint8Array(await file.arrayBuffer())
+    
     // Validate and upload file
-    const uploadResult = await processFileUpload(file, 'avatars', {
+    const uploadResult = await processFileUpload(buffer, {
+      folder: 'avatars',
       maxSize: 5 * 1024 * 1024, // 5MB
       allowedTypes: ['image/jpeg', 'image/png', 'image/gif', 'image/webp'],
-      resourceType: 'image'
+      resource_type: 'image'
     })
 
     // Update user profile with new avatar URL

@@ -31,8 +31,8 @@ serve(async (req) => {
       .from('stories')
       .select(`
         id, title, description, genre, cover_url, 
-        is_published, created_at, updated_at,
-        author:profiles(id, username, avatar_url),
+        is_published, created_at, updated_at, author_id,
+        author:profiles!stories_author_id_fkey(id, username, avatar_url),
         ratings:story_ratings(rating),
         bookmarks:story_bookmarks(id)
       `)
@@ -48,7 +48,8 @@ serve(async (req) => {
     const authResult = await verifyJWT(req)
     if (authResult.success) {
       const userId = authResult.user.sub
-      isAuthor = story.author?.id === userId
+      const authorData = story.author as any
+      isAuthor = Array.isArray(authorData) ? authorData[0]?.id === userId : authorData?.id === userId
     }
 
     if (!story.is_published && !isAuthor) {
@@ -62,24 +63,18 @@ serve(async (req) => {
       : 0
 
     // Get chapters if requested
-    let chapters = []
+    let chapters = undefined
     if (includeChapters) {
-      const { data: chaptersData, error: chaptersError } = await supabase
+      const { data: chaptersData } = await supabase
         .from('story_chapters')
-        .select('id, title, chapter_number, content, file_url, file_type, created_at')
+        .select('id, title, content, chapter_number, created_at')
         .eq('story_id', storyId)
-        .order('chapter_number', { ascending: true })
-
-      if (!chaptersError && chaptersData) {
-        chapters = chaptersData
-      }
+        .order('chapter_number')
+      
+      chapters = chaptersData || []
     }
 
-    // Increment view count if not author
-    if (!isAuthor) {
-      await supabase.rpc('increment_story_views', { story_id: storyId })
-    }
-
+    const authorData = story.author as any
     const response = {
       id: story.id,
       title: story.title,
@@ -90,9 +85,9 @@ serve(async (req) => {
       created_at: story.created_at,
       updated_at: story.updated_at,
       author: {
-        id: story.author?.id,
-        username: story.author?.username,
-        avatar_url: story.author?.avatar_url
+        id: Array.isArray(authorData) ? authorData[0]?.id : authorData?.id,
+        username: Array.isArray(authorData) ? authorData[0]?.username : authorData?.username,
+        avatar_url: Array.isArray(authorData) ? authorData[0]?.avatar_url : authorData?.avatar_url
       },
       stats: {
         average_rating: Math.round(averageRating * 10) / 10,
