@@ -19,22 +19,12 @@ export default function AuthCallbackPage() {
         const code = urlParams.get('code');
         console.log('PKCE code from URL:', code);
         
-        let sessionData;
-        if (code) {
-          console.log('Exchanging code for session...');
-          const { data: exchangeData, error: exchangeError } = await supabase.auth.exchangeCodeForSession(code);
-          console.log('Code exchange result:', { exchangeData, exchangeError });
-          if (exchangeError) {
-            console.error('Code exchange failed:', exchangeError);
-            navigate('/signin?error=code_exchange_failed');
-            return;
-          }
-          sessionData = exchangeData;
-        } else {
-          // Handle the OAuth callback
-          const { data, error } = await supabase.auth.getSession();
-          sessionData = data;
-        }
+        // Wait a moment for Supabase to process the OAuth callback
+        await new Promise(resolve => setTimeout(resolve, 1000));
+        
+        // Get the current session (Supabase should have processed the OAuth callback automatically)
+        const { data: sessionData, error: sessionError } = await supabase.auth.getSession();
+        console.log('Session after OAuth:', { sessionData, sessionError });
         
         console.log('Session data:', sessionData);
         
@@ -68,8 +58,13 @@ export default function AuthCallbackPage() {
             setTimeout(() => navigate('/profile'), 100);
           }
         } else {
-          console.log('No session found, redirecting to signin');
-          navigate('/signin?error=no_session');
+          console.log('No session found, redirecting to setup-username for new user');
+          // If no session but we have a code, this is likely a new user
+          if (code) {
+            setTimeout(() => navigate('/setup-username'), 100);
+          } else {
+            navigate('/signin?error=no_session');
+          }
         }
       } catch (error) {
         console.error('Auth callback error:', error);
