@@ -60,11 +60,12 @@ export default function AuthCallbackPage() {
           // If no profile exists or username is empty, go to setup
           if (!profile || !profile.username) {
             console.log('No profile found, redirecting to setup-username');
-            navigate('/setup-username');
+            // Add a small delay to ensure navigation works properly
+            setTimeout(() => navigate('/setup-username'), 100);
           } else {
             console.log('Profile exists, redirecting to profile');
             // User has username, go to profile
-            navigate('/profile');
+            setTimeout(() => navigate('/profile'), 100);
           }
         } else {
           console.log('No session found, redirecting to signin');
