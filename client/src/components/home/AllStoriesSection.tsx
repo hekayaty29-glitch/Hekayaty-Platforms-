@@ -7,13 +7,21 @@ import { StoryCard as StoryCardType } from "@/lib/types";
 import bgImg from "@/assets/d2c8245c-c591-4cc9-84d2-27252be8dffb.png";
 
 export default function AllStoriesSection() {
-  const { data: stories, isLoading } = useQuery<StoryCardType[]>({
+  const { data: stories, isLoading, error } = useQuery<StoryCardType[]>({
     queryKey: ["/api/stories"],
     queryFn: async () => {
       const { getEdgeFunctionUrl, EDGE_FUNCTIONS } = await import('../../lib/api-config');
-      const res = await fetch(getEdgeFunctionUrl(EDGE_FUNCTIONS.STORIES_LIST));
-      if (!res.ok) throw new Error('Failed to fetch stories');
+      const url = getEdgeFunctionUrl(EDGE_FUNCTIONS.STORIES_LIST);
+      console.log('Fetching stories from:', url);
+      const res = await fetch(url);
+      console.log('Response status:', res.status, res.statusText);
+      if (!res.ok) {
+        const errorText = await res.text();
+        console.error('API Error:', errorText);
+        throw new Error(`Failed to fetch stories: ${res.status} ${errorText}`);
+      }
       const data = await res.json();
+      console.log('Stories data:', data);
       return data.stories || [];
     }
   });
@@ -54,7 +62,24 @@ export default function AllStoriesSection() {
         {/* Grid */}
         {isLoading ? (
           <p className="text-center">Loading stories...</p>
-        ) : (
+        ) : error ? (
+          <div className="text-center py-12">
+            <div className="text-red-500 mb-4">
+              <p>Error loading stories: {error.message}</p>
+            </div>
+          </div>
+        ) : isLoading ? (
+          <div className="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-3 xl:grid-cols-4 gap-6">
+            {[...Array(8)].map((_, i) => (
+              <div key={i} className="animate-pulse">
+                <div className="bg-amber-200 h-48 rounded-t-lg mb-4"></div>
+                <div className="bg-amber-200 h-4 rounded mb-2"></div>
+                <div className="bg-amber-200 h-3 rounded mb-2"></div>
+                <div className="bg-amber-200 h-3 rounded w-2/3"></div>
+              </div>
+            ))}
+          </div>
+        ) : filtered.length > 0 ? (
           <div className="grid grid-cols-1 md:grid-cols-3 gap-8">
             {filtered.slice(0, 6).map((story) => (
               <StoryCard key={story.id} story={{
@@ -68,8 +93,9 @@ export default function AllStoriesSection() {
               }} />
             ))}
           </div>
+        ) : (
+          <p className="text-center">No stories found.</p>
         )}
-
         {/* Link to full browse page */}
         <div className="text-center mt-10">
           <Link
