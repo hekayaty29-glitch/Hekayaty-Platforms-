@@ -119,12 +119,15 @@ export async function registerRoutes(app: Express): Promise<Server> {
     description: z.string().min(10),
     role: z.string().min(2),
     image: z.string().url(),
+    backgroundStory: z.string().optional(),
+    characterType: z.string().optional(),
+    associatedStories: z.array(z.number()).optional(),
   });
 
   app.post("/api/characters", requireAuth, async (req: Request, res: Response) => {
     try {
       const body = insertCharacterSchema.parse(req.body);
-      const created = await supabaseStorage.createCharacter(body);
+      const created = await supabaseStorage.createCharacter(body as { name: string; description: string; role: string; image: string; backgroundStory?: string; characterType?: string; associatedStories?: number[]; });
       if (!created) {
         return res.status(500).json({ message: "Could not create character" });
       }
@@ -1577,14 +1580,15 @@ export async function registerRoutes(app: Express): Promise<Server> {
     }
     
     try {
-      const data = insertRatingSchema.parse({
+      const requestData = {
         ...req.body,
         userId: req.user!.id,
         storyId
-      });
+      };
+      const data = insertRatingSchema.parse(requestData) as any;
       
       // Check if user already rated
-      const existingRating = await supabaseStorage.getRating(data.userId, data.storyId);
+      const existingRating = await supabaseStorage.getRating(String(data.userId), String(data.storyId));
       
       let rating;
       if (existingRating) {
@@ -1594,8 +1598,8 @@ export async function registerRoutes(app: Express): Promise<Server> {
         });
       } else {
         rating = await supabaseStorage.createRating({
-          user_id: data.userId,
-          story_id: data.storyId,
+          user_id: String(data.userId),
+          story_id: String(data.storyId),
           rating: data.rating,
           review: data.review || ''
         });

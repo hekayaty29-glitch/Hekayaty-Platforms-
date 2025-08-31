@@ -98,11 +98,7 @@ export const insertStoryGenreSchema = createInsertSchema(storyGenres, {
   genreId: z.number()
 });
 
-export const insertRatingSchema = createInsertSchema(ratings, {
-  userId: z.number(),
-  storyId: z.number(),
-  rating: z.number()
-});
+export const insertRatingSchema = createInsertSchema(ratings);
 
 export const insertBookmarkSchema = createInsertSchema(bookmarks, {
   userId: z.number(),

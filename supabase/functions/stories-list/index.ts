@@ -28,27 +28,22 @@ serve(async (req) => {
     let query = supabase
       .from('stories')
       .select(`
-        id, title, description, genre, cover_url, 
-        created_at, updated_at,
-        author:profiles!stories_author_id_fkey(id, username, avatar_url),
-        ratings:story_ratings(rating),
-        bookmarks:story_bookmarks(id)
+        id, title, description, cover_image_url, 
+        created_at, updated_at, is_published,
+        author:users!stories_author_id_fkey(id, username, avatar_url),
+        story_genres(genres(id, name))
       `)
       .eq('is_published', true)
       .order('created_at', { ascending: false })
 
     // Apply filters
-    if (genre) {
-      query = query.eq('genre', genre)
-    }
-
     if (search) {
       query = query.or(`title.ilike.%${search}%,description.ilike.%${search}%`)
     }
 
     if (featured) {
-      // Featured stories could be based on ratings or bookmarks
-      query = query.order('created_at', { ascending: false })
+      // Featured stories could be based on views or likes
+      query = query.order('views_count', { ascending: false })
     }
 
     // Apply pagination
@@ -63,31 +58,24 @@ serve(async (req) => {
 
     // Process stories data
     const processedStories = (stories || []).map((story: any) => {
-      const ratings = story.ratings || []
-      const averageRating = ratings.length > 0 
-        ? ratings.reduce((sum: number, r: any) => sum + r.rating, 0) / ratings.length 
-        : 0
-
       const authorData = story.author as any
+      const genres = story.story_genres?.map((sg: any) => sg.genres) || []
 
       return {
         id: story.id,
         title: story.title,
         description: story.description,
-        genre: story.genre,
-        cover_url: story.cover_url,
+        genres: genres,
+        coverUrl: story.cover_image_url,
         created_at: story.created_at,
         updated_at: story.updated_at,
         author: {
           id: Array.isArray(authorData) ? authorData[0]?.id : authorData?.id,
-          username: Array.isArray(authorData) ? authorData[0]?.username : authorData?.username,
-          avatar_url: Array.isArray(authorData) ? authorData[0]?.avatar_url : authorData?.avatar_url
+          fullName: Array.isArray(authorData) ? authorData[0]?.username : authorData?.username,
+          avatarUrl: Array.isArray(authorData) ? authorData[0]?.avatar_url : authorData?.avatar_url
         },
-        stats: {
-          average_rating: Math.round(averageRating * 10) / 10,
-          total_ratings: ratings.length,
-          total_bookmarks: story.bookmarks?.length || 0
-        }
+        averageRating: 0,
+        ratingCount: 0
       }
     })
 

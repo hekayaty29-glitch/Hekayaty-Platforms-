@@ -42,6 +42,51 @@ serve(async (req) => {
 
       return createSuccessResponse({ profile })
 
+    } else if (req.method === 'POST') {
+      // Complete profile setup (for new users)
+      const { username, fullName } = await req.json()
+
+      if (!username || username.length < 3) {
+        return createErrorResponse('Username must be at least 3 characters', 400)
+      }
+
+      if (!fullName || fullName.length < 2) {
+        return createErrorResponse('Full name is required', 400)
+      }
+
+      // Check if username is already taken
+      const { data: existingUser } = await supabase
+        .from('profiles')
+        .select('id')
+        .eq('username', sanitizeInput(username))
+        .single()
+
+      if (existingUser) {
+        return createErrorResponse('Username already taken', 400)
+      }
+
+      // Create or update profile
+      const { data: profile, error } = await supabase
+        .from('profiles')
+        .upsert({
+          id: userId,
+          username: sanitizeInput(username),
+          full_name: sanitizeInput(fullName),
+          updated_at: new Date().toISOString()
+        })
+        .select()
+        .single()
+
+      if (error) {
+        console.error('Profile creation error:', error)
+        return createErrorResponse('Failed to create profile', 500)
+      }
+
+      return createSuccessResponse({
+        message: 'Profile created successfully',
+        profile: profile
+      })
+
     } else if (req.method === 'PUT') {
       // Update user profile
       const { username, bio, avatar_url } = await req.json()

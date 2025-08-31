@@ -72,7 +72,15 @@ export default function SetupUsernamePage() {
     setIsLoading(true);
     setError("");
     try {
-      const res = await apiRequest("POST", "/api/auth/complete-profile", data);
+      const { getEdgeFunctionUrl, EDGE_FUNCTIONS } = await import('../lib/api-config');
+      const res = await fetch(getEdgeFunctionUrl(EDGE_FUNCTIONS.AUTH_PROFILE), {
+        method: 'POST',
+        headers: {
+          'Content-Type': 'application/json',
+          'Authorization': `Bearer ${(await supabase.auth.getSession()).data.session?.access_token}`
+        },
+        body: JSON.stringify(data)
+      });
       const json = await res.json();
       if (!res.ok) throw new Error(json?.message || "Failed to complete profile");
       // update auth context so navbar shows new username immediately
