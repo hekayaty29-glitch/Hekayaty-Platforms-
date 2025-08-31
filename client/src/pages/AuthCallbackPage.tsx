@@ -10,22 +10,46 @@ export default function AuthCallbackPage() {
   useEffect(() => {
     const handleAuthCallback = async () => {
       try {
-        // Handle the OAuth callback
-        const { data, error } = await supabase.auth.getSession();
+        console.log('Auth callback page loaded');
+        console.log('Current URL:', window.location.href);
+        console.log('URL params:', window.location.search);
         
-        if (error) {
-          console.error('Auth callback error:', error);
-          navigate('/signin?error=auth_failed');
-          return;
+        // Exchange PKCE code for session on first load (safe no-op if not present)
+        const urlParams = new URLSearchParams(window.location.search);
+        const code = urlParams.get('code');
+        console.log('PKCE code from URL:', code);
+        
+        let sessionData;
+        if (code) {
+          console.log('Exchanging code for session...');
+          const { data: exchangeData, error: exchangeError } = await supabase.auth.exchangeCodeForSession(code);
+          console.log('Code exchange result:', { exchangeData, exchangeError });
+          if (exchangeError) {
+            console.error('Code exchange failed:', exchangeError);
+            navigate('/signin?error=code_exchange_failed');
+            return;
+          }
+          sessionData = exchangeData;
+        } else {
+          // Handle the OAuth callback
+          const { data, error } = await supabase.auth.getSession();
+          sessionData = data;
         }
-
-        if (data.session?.user) {
+        
+        console.log('Session data:', sessionData);
+        
+        if (sessionData?.session?.user) {
+          console.log('User found in session:', sessionData.session.user.id);
+          
           // Check if user has a username set up in profiles table
           const { data: profile, error: profileError } = await supabase
             .from('profiles')
             .select('username')
-            .eq('id', data.session.user.id)
+            .eq('id', sessionData.session.user.id)
             .single();
+
+          console.log('Profile data:', profile);
+          console.log('Profile error:', profileError);
 
           if (profileError && profileError.code !== 'PGRST116') {
             console.error('Profile check error:', profileError);
@@ -35,12 +59,15 @@ export default function AuthCallbackPage() {
 
           // If no profile exists or username is empty, go to setup
           if (!profile || !profile.username) {
+            console.log('No profile found, redirecting to setup-username');
             navigate('/setup-username');
           } else {
+            console.log('Profile exists, redirecting to profile');
             // User has username, go to profile
             navigate('/profile');
           }
         } else {
+          console.log('No session found, redirecting to signin');
           navigate('/signin?error=no_session');
         }
       } catch (error) {
