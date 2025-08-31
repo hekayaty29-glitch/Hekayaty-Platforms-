@@ -11,7 +11,7 @@ export const API_CONFIG = {
   LEGACY_API_BASE: '/api',
   
   // Feature flag to switch between Edge Functions and legacy API
-  USE_EDGE_FUNCTIONS: false, // Temporarily disabled for debugging
+  USE_EDGE_FUNCTIONS: import.meta.env.VITE_USE_EDGE_FUNCTIONS === 'true', // Controlled by environment variable
 }
 
 // Edge Functions endpoint mappings
