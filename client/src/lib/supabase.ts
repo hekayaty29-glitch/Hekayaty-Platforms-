@@ -8,11 +8,11 @@ import { createClient } from '@supabase/supabase-js';
 // Do NOT commit your service role key.
 
 const supabaseUrl = import.meta.env.VITE_SUPABASE_URL as string;
-const supabaseAnonKey = import.meta.env.VITE_SUPABASE_ANON as string;
+const supabaseAnonKey = import.meta.env.VITE_SUPABASE_ANON_KEY as string;
 
 if (!supabaseUrl || !supabaseAnonKey) {
   // eslint-disable-next-line no-console
-  console.warn('[supabase] Missing VITE_SUPABASE_URL or VITE_SUPABASE_ANON env variables. Supabase client will not work properly.');
+  console.warn('[supabase] Missing VITE_SUPABASE_URL or VITE_SUPABASE_ANON_KEY env variables. Supabase client will not work properly.');
 }
 
 export const supabase = createClient(supabaseUrl, supabaseAnonKey, {
