@@ -65,6 +65,26 @@ export default function BrowseStoriesPage() {
           : "/api/stories"
     ],
     enabled: !isBookmarks || isAuthenticated,
+    queryFn: async () => {
+      const { getEdgeFunctionUrl, EDGE_FUNCTIONS } = await import('../lib/api-config');
+      
+      if (isTopRated) {
+        const res = await fetch(`${getEdgeFunctionUrl(EDGE_FUNCTIONS.STORIES_LIST)}?featured=true`);
+        if (!res.ok) throw new Error('Failed to fetch top-rated stories');
+        const data = await res.json();
+        return data.stories || [];
+      } else if (isBookmarks) {
+        // Handle bookmarks API call
+        const res = await fetch('/api/bookmarks');
+        if (!res.ok) throw new Error('Failed to fetch bookmarks');
+        return res.json();
+      } else {
+        const res = await fetch(getEdgeFunctionUrl(EDGE_FUNCTIONS.STORIES_LIST));
+        if (!res.ok) throw new Error('Failed to fetch stories');
+        const data = await res.json();
+        return data.stories || [];
+      }
+    }
   });
 
   // Fetch comics if not bookmarks/top-rated

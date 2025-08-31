@@ -9,6 +9,13 @@ import bgImg from "@/assets/d2c8245c-c591-4cc9-84d2-27252be8dffb.png";
 export default function AllStoriesSection() {
   const { data: stories, isLoading } = useQuery<StoryCardType[]>({
     queryKey: ["/api/stories"],
+    queryFn: async () => {
+      const { getEdgeFunctionUrl, EDGE_FUNCTIONS } = await import('../../lib/api-config');
+      const res = await fetch(getEdgeFunctionUrl(EDGE_FUNCTIONS.STORIES_LIST));
+      if (!res.ok) throw new Error('Failed to fetch stories');
+      const data = await res.json();
+      return data.stories || [];
+    }
   });
 
   const [query, setQuery] = useState("");

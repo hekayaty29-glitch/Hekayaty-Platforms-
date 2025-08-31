@@ -24,6 +24,7 @@ export const EDGE_FUNCTIONS = {
   // Stories
   STORIES_CREATE: 'stories-create',
   STORIES_READ: 'stories-read',
+  STORIES_LIST: 'stories-list',
   STORIES_UPDATE: 'stories-update',
   STORIES_PUBLISH: 'stories-publish',
   STORIES_CHAPTERS: 'stories-chapters',
@@ -72,6 +73,8 @@ export const LEGACY_ENDPOINTS = {
   // Story endpoints
   'stories/create': EDGE_FUNCTIONS.STORIES_CREATE,
   'stories/read': EDGE_FUNCTIONS.STORIES_READ,
+  'stories/list': EDGE_FUNCTIONS.STORIES_LIST,
+  'stories': EDGE_FUNCTIONS.STORIES_LIST,
   'stories/update': EDGE_FUNCTIONS.STORIES_UPDATE,
   'stories/publish': EDGE_FUNCTIONS.STORIES_PUBLISH,
   'stories/chapters': EDGE_FUNCTIONS.STORIES_CHAPTERS,
