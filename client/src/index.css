@@ -1,0 +1,321 @@
+@tailwind base;
+@tailwind components;
+@tailwind utilities;
+
+:root {
+  /* Dark fantasy theme colors */
+  --background: 27 25% 8%;
+  --foreground: 35 40% 95%;
+  --muted: 28 15% 12%;
+  --muted-foreground: 28 10% 70%;
+  --popover: 27 25% 10%;
+  --popover-foreground: 35 40% 95%;
+  --card: 27 25% 13%;
+  --card-foreground: 35 40% 95%;
+  --border: 28 15% 18%;
+  --input: 28 15% 18%;
+  --primary: 35 80% 46%;
+  --primary-foreground: 35 40% 95%;
+  --secondary: 25 60% 25%;
+  --secondary-foreground: 35 40% 95%;
+  --accent: 35 80% 46%;
+  --accent-foreground: 35 40% 95%;
+  --destructive: 0 62.8% 30.6%;
+  --destructive-foreground: 0 0% 98%;
+  --ring: 35 80% 46%;
+  --radius: 0.5rem;
+  
+  /* Reading preferences variables */
+  --reader-font-size: 1.125rem;
+  --reader-line-height: 1.8;
+  --reader-max-width: 780px;
+  --reader-font-family: 'Crimson Text', 'Garamond', serif;
+  --reader-bg-color: hsl(35, 40%, 95%);
+  --reader-text-color: hsl(27, 25%, 15%);
+}
+
+.dark {
+  --background: 27 25% 6%;
+  --foreground: 35 40% 95%;
+  --muted: 28 15% 10%;
+  --muted-foreground: 28 10% 70%;
+  --popover: 27 25% 8%;
+  --popover-foreground: 35 40% 95%;
+  --card: 27 25% 11%;
+  --card-foreground: 35 40% 95%;
+  --border: 28 15% 15%;
+  --input: 28 15% 15%;
+  --primary: 35 80% 40%;
+  --primary-foreground: 35 40% 95%;
+  --secondary: 25 60% 25%;
+  --secondary-foreground: 35 40% 95%;
+  --accent: 35 80% 40%;
+  --accent-foreground: 35 40% 95%;
+  --destructive: 0 62.8% 30.6%;
+  --destructive-foreground: 0 0% 98%;
+  --ring: 35 80% 40%;
+  --radius: 0.5rem;
+  
+  /* Reading preferences in dark mode */
+  --reader-bg-color: hsl(27, 25%, 12%);
+  --reader-text-color: hsl(35, 40%, 95%);
+}
+
+@layer base {
+  * {
+    @apply border-border;
+  }
+
+  body {
+    @apply font-sans bg-[#1A150E] text-foreground;
+  }
+}
+
+/* Custom colors */
+.text-amber-deep {
+  color: #D68C47;
+}
+
+.text-bronze-dark {
+  color: #8D5524;
+}
+
+.text-gold-rich {
+  color: #E6B17E;
+}
+
+.text-brown-dark {
+  color: #3D2914;
+}
+
+.text-parchment {
+  color: #F8F0E3;
+}
+
+.bg-amber-deep {
+  background-color: #D68C47;
+}
+
+.bg-bronze-dark {
+  background-color: #8D5524;
+}
+
+.bg-gold-rich {
+  background-color: #E6B17E;
+}
+
+.bg-brown-dark {
+  background-color: #3D2914;
+}
+
+.bg-midnight-blue {
+  background-color: #1F2937;
+}
+
+.bg-parchment {
+  background-color: #F8F0E3;
+}
+
+.border-amber-deep {
+  border-color: #D68C47;
+}
+
+.border-bronze-dark {
+  border-color: #8D5524;
+}
+
+.border-gold-rich {
+  border-color: #E6B17E;
+}
+
+.border-brown-dark {
+  border-color: #3D2914;
+}
+
+.hover\:bg-amber-deep:hover {
+  background-color: #D68C47;
+}
+
+.hover\:bg-bronze-dark:hover {
+  background-color: #8D5524;
+}
+
+.hover\:text-amber-deep:hover {
+  color: #D68C47;
+}
+
+/* Custom fonts */
+.font-cinzel {
+  font-family: 'Cinzel', serif;
+}
+
+.font-nunito {
+  font-family: 'Nunito', sans-serif;
+}
+
+.font-cormorant {
+  font-family: 'Cormorant Garamond', serif;
+}
+
+/* Hero section with castle background */
+.hero-section {
+  background-image: linear-gradient(rgba(0, 0, 0, 0.25), rgba(0, 0, 0, 0.35)), url('./assets/faf6c4d1-e73f-4acb-9193-5de6bf9f957a (1).png');
+  background-size: cover;
+  background-position: center;
+  background-attachment: fixed;
+}
+
+/* Card hover effects */
+.story-card {
+  transition: transform 0.3s ease;
+}
+
+.story-card:hover {
+  transform: translateY(-5px);
+}
+
+/* Genre badge styling */
+.genre-badge {
+  background-color: rgba(214, 140, 71, 0.9);
+  transition: all 0.3s ease;
+}
+
+.genre-badge:hover {
+  background-color: rgba(141, 85, 36, 1);
+}
+
+/* Reading container */
+.reading-container {
+  max-width: var(--reader-max-width);
+  margin: 0 auto;
+  line-height: var(--reader-line-height);
+  font-size: var(--reader-font-size);
+  font-family: var(--reader-font-family);
+  color: var(--reader-text-color);
+  transition: all 0.3s ease;
+  padding: 0 1.5rem;
+  text-align: justify;
+  text-rendering: optimizeLegibility;
+  -webkit-font-smoothing: antialiased;
+  -moz-osx-font-smoothing: grayscale;
+  text-shadow: 0 0 1px transparent; /* Improves font rendering */
+}
+
+/* Reader themes */
+.reader-theme-light {
+  --reader-bg-color: hsl(35, 40%, 97%);
+  --reader-text-color: hsl(27, 35%, 10%); /* Darker text for better contrast */
+}
+
+.reader-theme-dark {
+  --reader-bg-color: hsl(27, 25%, 10%); /* Slightly darker background */
+  --reader-text-color: hsl(35, 80%, 96%); /* Brighter text for better readability */
+}
+
+.reader-theme-sepia {
+  --reader-bg-color: hsl(30, 35%, 92%);
+  --reader-text-color: hsl(25, 75%, 15%); /* Much darker, richer text */
+}
+
+/* Reader font families */
+.reader-font-serif {
+  --reader-font-family: 'Crimson Text', 'Garamond', 'Georgia', serif;
+  font-weight: 500; /* Slightly bolder for better readability */
+  letter-spacing: 0.01em; /* Better character spacing */
+}
+
+.reader-font-sans {
+  --reader-font-family: 'Nunito', 'Open Sans', 'Avenir', sans-serif;
+  font-weight: 450; /* Slightly heavier for readability */
+  letter-spacing: 0.015em; /* Slightly wider letter spacing */
+}
+
+/* Reader font sizes */
+.reader-text-sm {
+  --reader-font-size: 0.95rem;
+  --reader-line-height: 1.6;
+}
+
+.reader-text-md {
+  --reader-font-size: 1.125rem;
+  --reader-line-height: 1.8;
+}
+
+.reader-text-lg {
+  --reader-font-size: 1.3rem;
+  --reader-line-height: 1.9;
+}
+
+.reader-text-xl {
+  --reader-font-size: 1.5rem;
+  --reader-line-height: 2;
+}
+
+/* Reader wrapper */
+.reader-wrapper {
+  background-color: var(--reader-bg-color);
+  padding: 2.5rem 1.5rem;
+  border-radius: 0.5rem;
+  box-shadow: 0 5px 20px rgba(0, 0, 0, 0.1);
+  transition: all 0.3s ease;
+  border: 1px solid rgba(214, 140, 71, 0.15);
+}
+
+/* Editor styles */
+.editor-container {
+  min-height: 400px;
+  border: 1px solid #D68C47;
+  border-radius: 0.375rem;
+  padding: 1rem;
+  background-color: white;
+}
+
+.editor-container:focus-within {
+  outline: 2px solid #D68C47;
+  outline-offset: 2px;
+}
+
+/* Text shadow for hero elements */
+.text-shadow {
+  text-shadow: 0 3px 6px rgba(0, 0, 0, 0.4), 0 2px 4px rgba(0, 0, 0, 0.8);
+}
+
+.text-shadow-sm {
+  text-shadow: 0 2px 4px rgba(0, 0, 0, 0.3);
+}
+
+/* Paginated Reader Styles */
+.reader-paginated {
+  min-height: 70vh;
+}
+
+/* Reading Progress */
+.reading-progress-bar {
+  position: fixed;
+  top: 0;
+  left: 0;
+  height: 3px;
+  background-color: #D68C47;
+  z-index: 50;
+  transition: width 0.3s ease;
+}
+
+/* Smooth Scrolling */
+html {
+  scroll-behavior: smooth;
+}
+
+/* Text reader styling */
+.text-reader {
+  color: var(--reader-text-color);
+  font-family: var(--reader-font-family);
+  font-size: var(--reader-font-size);
+  text-indent: 1.5em; /* First line paragraph indent */
+}
+
+.parchment-page {
+  background-image: url('/assets/parchment.png');
+  background-size: cover;
+  background-position: center;
+  @apply bg-no-repeat bg-[#fbf2c6] shadow-lg border border-amber-300 rounded-md p-6 md:p-10 max-w-3xl mx-auto;
+}
