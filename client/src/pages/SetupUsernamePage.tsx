@@ -95,6 +95,9 @@ export default function SetupUsernamePage() {
       if (!res.ok) throw new Error(json?.message || "Failed to complete profile");
       // update auth context so navbar shows new username immediately
       updateUser({ username: data.username, fullName: data.fullName });
+      
+      // Force refresh of auth session to get updated profile data
+      window.location.reload();
       navigate("/profile");
     } catch (e: any) {
       setError(e.message);
