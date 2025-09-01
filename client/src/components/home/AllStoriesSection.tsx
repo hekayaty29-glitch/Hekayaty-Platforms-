@@ -13,7 +13,11 @@ export default function AllStoriesSection() {
       const { getEdgeFunctionUrl, EDGE_FUNCTIONS } = await import('../../lib/api-config');
       const url = getEdgeFunctionUrl(EDGE_FUNCTIONS.STORIES_LIST);
       console.log('Fetching stories from:', url);
-      const res = await fetch(url);
+      const res = await fetch(url, {
+        headers: {
+          'Content-Type': 'application/json'
+        }
+      });
       console.log('Response status:', res.status, res.statusText);
       if (!res.ok) {
         const errorText = await res.text();
