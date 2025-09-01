@@ -32,12 +32,30 @@ export function AuthProvider({ children }: { children: ReactNode }) {
   const queryClient = useQueryClient();
   const [isAuthenticated, setIsAuthenticated] = useState(false);
   
-  // Fetch current user
+  // Fetch current user with profile data
   const { data: user, isLoading } = useQuery({
     queryKey: ['auth','session'],
     queryFn: async ()=>{
       const { data } = await supabase.auth.getUser();
-      return data.user;
+      if (!data.user) return null;
+      
+      // Fetch profile data including username
+      const { data: profile } = await supabase
+        .from('profiles')
+        .select('username, full_name, bio, avatar_url, role, subscription_type')
+        .eq('id', data.user.id)
+        .single();
+      
+      // Merge auth user with profile data
+      return {
+        ...data.user,
+        username: profile?.username || null,
+        fullName: profile?.full_name || null,
+        bio: profile?.bio || null,
+        avatar_url: profile?.avatar_url || null,
+        role: profile?.role || 'free',
+        subscription_type: profile?.subscription_type || 'free'
+      };
     }
   });
   
