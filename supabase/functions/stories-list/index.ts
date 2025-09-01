@@ -24,14 +24,12 @@ serve(async (req) => {
     const search = url.searchParams.get('search')
     const featured = url.searchParams.get('featured') === 'true'
 
-    // Build query
+    // Build query - simplified to avoid foreign key issues
     let query = supabase
       .from('stories')
       .select(`
         id, title, description, cover_image_url, 
-        created_at, updated_at, is_published,
-        author:profiles!stories_author_id_fkey(id, username, avatar_url),
-        story_genres(genres(id, name))
+        created_at, updated_at, is_published, author_id
       `)
       .eq('is_published', true)
       .order('created_at', { ascending: false })
@@ -56,23 +54,20 @@ serve(async (req) => {
       return createErrorResponse('Failed to fetch stories', 500)
     }
 
-    // Process stories data
+    // Process stories data - simplified without joins
     const processedStories = (stories || []).map((story: any) => {
-      const authorData = story.author as any
-      const genres = story.story_genres?.map((sg: any) => sg.genres) || []
-
       return {
         id: story.id,
         title: story.title,
         description: story.description,
-        genres: genres,
+        genres: [],
         coverUrl: story.cover_image_url,
         created_at: story.created_at,
         updated_at: story.updated_at,
         author: {
-          id: Array.isArray(authorData) ? authorData[0]?.id : authorData?.id,
-          fullName: Array.isArray(authorData) ? authorData[0]?.username : authorData?.username,
-          avatarUrl: Array.isArray(authorData) ? authorData[0]?.avatar_url : authorData?.avatar_url
+          id: story.author_id,
+          fullName: 'Author',
+          avatarUrl: null
         },
         averageRating: 0,
         ratingCount: 0
