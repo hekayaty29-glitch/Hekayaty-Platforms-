@@ -12,9 +12,10 @@ serve(async (req) => {
       return createErrorResponse('Method not allowed', 405)
     }
 
+    // Use anon key for public access to published stories
     const supabase = createClient(
       Deno.env.get('SUPABASE_URL') ?? '',
-      Deno.env.get('SUPABASE_SERVICE_ROLE_KEY') ?? ''
+      Deno.env.get('SUPABASE_ANON_KEY') ?? ''
     )
 
     const url = new URL(req.url)
@@ -51,8 +52,10 @@ serve(async (req) => {
 
     if (error) {
       console.error('Database error:', error)
-      return createErrorResponse('Failed to fetch stories', 500)
+      return createErrorResponse(`Database error: ${error.message}`, 500)
     }
+    
+    console.log('Stories fetched successfully:', stories?.length || 0)
 
     // Process stories data - simplified without joins
     const processedStories = (stories || []).map((story: any) => {
