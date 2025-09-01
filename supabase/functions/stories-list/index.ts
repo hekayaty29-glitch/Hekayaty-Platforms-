@@ -30,7 +30,7 @@ serve(async (req) => {
       .select(`
         id, title, description, cover_image_url, 
         created_at, updated_at, is_published,
-        author:users!stories_author_id_fkey(id, username, avatar_url),
+        author:profiles!stories_author_id_fkey(id, username, avatar_url),
         story_genres(genres(id, name))
       `)
       .eq('is_published', true)
