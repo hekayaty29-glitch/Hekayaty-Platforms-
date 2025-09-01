@@ -79,7 +79,8 @@ export default function SetupUsernamePage() {
       console.log('Auth token for profile setup:', token ? 'Token present' : 'No token');
       
       const headers: Record<string, string> = {
-        'Content-Type': 'application/json'
+        'Content-Type': 'application/json',
+        'apikey': import.meta.env.VITE_SUPABASE_ANON_KEY || ''
       };
       
       if (token) {

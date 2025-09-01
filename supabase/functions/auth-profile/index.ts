@@ -12,16 +12,24 @@ serve(async (req) => {
   try {
     const supabase = createClient(
       Deno.env.get('SUPABASE_URL') ?? '',
-      Deno.env.get('SUPABASE_SERVICE_ROLE_KEY') ?? ''
+      Deno.env.get('SUPABASE_ANON_KEY') ?? ''
     )
 
-    // Verify JWT token
-    const authResult = await verifyJWT(req)
-    if (!authResult.success) {
-      return createErrorResponse(authResult.error, 401)
+    // Get auth header for user identification
+    const authHeader = req.headers.get('Authorization')
+    if (!authHeader) {
+      return createErrorResponse('Authorization header required', 401)
     }
 
-    const userId = authResult.user.sub
+    const token = authHeader.replace('Bearer ', '')
+    const { data: { user }, error: authError } = await supabase.auth.getUser(token)
+    
+    if (authError || !user) {
+      console.error('Auth error:', authError)
+      return createErrorResponse('Invalid token', 401)
+    }
+
+    const userId = user.id
 
     if (req.method === 'GET') {
       // Get user profile
