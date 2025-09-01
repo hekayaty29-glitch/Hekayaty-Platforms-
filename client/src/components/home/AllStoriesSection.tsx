@@ -45,7 +45,10 @@ export default function AllStoriesSection() {
         {/* Heading */}
         <div className="flex items-center justify-center gap-3 mb-10">
           <BookOpen className="h-6 w-6 text-amber-400" />
-          <h2 className="font-cinzel text-3xl md:text-4xl font-bold text-center">
+          <h2 
+            className="font-cinzel text-3xl md:text-4xl font-bold text-center cursor-pointer hover:text-amber-300 transition-colors"
+            onClick={() => window.location.href = '/stories'}
+          >
             Browse All Stories
           </h2>
           <BookOpen className="h-6 w-6 text-amber-400" />
