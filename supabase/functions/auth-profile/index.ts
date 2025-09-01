@@ -36,9 +36,7 @@ serve(async (req) => {
       const { data: profile, error } = await supabase
         .from('profiles')
         .select(`
-          id, username, email, role, subscription_type, 
-          avatar_url, bio, created_at, last_login,
-          stories_count, followers_count, following_count
+          id, username, email, full_name, bio
         `)
         .eq('id', userId)
         .single()
@@ -79,8 +77,7 @@ serve(async (req) => {
         .upsert({
           id: userId,
           username: sanitizeInput(username),
-          full_name: sanitizeInput(fullName),
-          updated_at: new Date().toISOString()
+          full_name: sanitizeInput(fullName)
         })
         .select()
         .single()
@@ -125,15 +122,11 @@ serve(async (req) => {
         updates.bio = sanitizeInput(bio)
       }
 
-      if (avatar_url !== undefined) {
-        updates.avatar_url = sanitizeInput(avatar_url)
-      }
 
       if (Object.keys(updates).length === 0) {
         return createErrorResponse('No valid fields to update', 400)
       }
 
-      updates.updated_at = new Date().toISOString()
 
       const { data: updatedProfile, error } = await supabase
         .from('profiles')
